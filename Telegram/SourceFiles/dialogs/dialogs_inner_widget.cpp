@@ -1761,6 +1761,7 @@ void InnerWidget::mouseMoveEvent(QMouseEvent *e) {
 
 	if (_pressed && (e->buttons() & Qt::LeftButton)) {
 		const auto local = e->pos();
+		checkReorderPinnedStart(local);
 		const auto outside = _dragging ? false : true;
 		const auto delta = local - _dragStart;
 		const auto thresholdY = _pressed->entry()->isPinnedDialog(_filterId)

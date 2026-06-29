@@ -1792,8 +1792,8 @@ object_ptr<Ui::RpWidget> DetailsFiller::setupInfo() {
 			) | rpl::map([=]() -> TextWithEntities {
 				const auto note = AyuSettings::getInstance().peerNote(peerId);
 				return note.isEmpty()
-					? tr::link(TextWithEntities{ tr::ayu_NoteAdd(tr::now) }, 1)
-					: tr::link(TextWithEntities{ note }, 1);
+					? tr::link(TextWithEntities{ tr::ayu_NoteAdd(tr::now) })
+					: tr::link(TextWithEntities{ note });
 			});
 			const auto noteLine = addInfoOneLine(
 				tr::ayu_NoteLabel(),

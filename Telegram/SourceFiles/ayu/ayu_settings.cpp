@@ -142,6 +142,7 @@ void GhostModeAccountSettings::setGhostModeEnabled(bool val) {
 	if (!_sendOnlinePacketsLocked.current()) _sendOnlinePackets = !val;
 	if (!_sendUploadProgressLocked.current()) _sendUploadProgress = !val;
 	if (!_sendOfflinePacketAfterOnlineLocked.current()) _sendOfflinePacketAfterOnline = val;
+	_markReadAfterAction = !val;
 	AyuSettings::save();
 
 	if (val) {

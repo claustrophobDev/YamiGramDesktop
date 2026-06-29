@@ -30,6 +30,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_dialogs.h"
 
 // AyuGram includes
+#include "ayu/ayu_settings.h"
 #include "ayu/ui/ayu_userpic.h"
 
 
@@ -309,13 +310,18 @@ const std::vector<not_null<History*>> &Folder::lastHistories() const {
 }
 
 void Folder::validateListEntryCache() {
-	if (_listEntryCacheVersion == _chatListViewVersion) {
+	const auto incognito = AyuSettings::getInstance().incognitoMode();
+	if (_listEntryCacheVersion == _chatListViewVersion
+		&& _listEntryCacheIncognito == incognito) {
 		return;
 	}
 	_listEntryCacheVersion = _chatListViewVersion;
+	_listEntryCacheIncognito = incognito;
 	_listEntryCache.setMarkedText(
 		st::dialogsTextStyle,
-		ComposeFolderListEntryText(this),
+		incognito
+			? TextWithEntities{ u"[HIDDEN]"_q }
+			: ComposeFolderListEntryText(this),
 		// Use rich options as long as the entry text does not have user text.
 		Ui::ItemTextDefaultOptions());
 }

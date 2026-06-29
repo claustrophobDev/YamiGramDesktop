@@ -104,7 +104,9 @@ QString TopBarNameText(
 			return tr::lng_hidden_author_messages(tr::now);
 		}
 	}
-	return peer->topBarNameText();
+	return AyuSettings::getInstance().incognitoMode()
+		? u"[HIDDEN]"_q
+		: peer->topBarNameText();
 }
 
 } // namespace
@@ -637,6 +639,8 @@ void TopBarWidget::paintTopBar(Painter &p) {
 			? tr::lng_replies_messages(tr::now)
 			: peer->isVerifyCodes()
 			? tr::lng_verification_codes(tr::now)
+			: AyuSettings::getInstance().incognitoMode()
+			? u"[HIDDEN]"_q
 			: peer->name();
 		const auto textWidth = st::historySavedFont->width(text);
 		if (namewidth < textWidth) {
@@ -671,8 +675,11 @@ void TopBarWidget::paintTopBar(Painter &p) {
 			paintStatus(p, statusleft, statustop, statuswidth, width());
 		}
 	} else if (namePeer) {
-		if (_titleNameVersion < namePeer->nameVersion()) {
+		const auto incognito = AyuSettings::getInstance().incognitoMode();
+		if (_titleNameVersion < namePeer->nameVersion()
+			|| _titleIncognito != incognito) {
 			_titleNameVersion = namePeer->nameVersion();
+			_titleIncognito = incognito;
 			_title.setText(
 				st::msgNameStyle,
 				TopBarNameText(namePeer, _activeChat),

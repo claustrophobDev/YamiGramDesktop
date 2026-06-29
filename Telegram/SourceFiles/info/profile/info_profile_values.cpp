@@ -36,6 +36,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/peers/edit_peer_permissions_box.h"
 #include "base/unixtime.h"
 
+// AyuGram includes
+#include "ayu/ayu_settings.h"
+
 namespace Info {
 namespace Profile {
 namespace {
@@ -96,10 +99,14 @@ rpl::producer<QString> NameValue(not_null<PeerData*> peer) {
 	if (const auto broadcast = peer->monoforumBroadcast()) {
 		return NameValue(broadcast);
 	}
-	return peer->session().changes().peerFlagsValue(
-		peer,
-		UpdateFlag::Name
-	) | rpl::map([=] { return peer->name(); });
+	return rpl::combine(
+		peer->session().changes().peerFlagsValue(
+			peer,
+			UpdateFlag::Name),
+		AyuSettings::getInstance().incognitoModeValue()
+	) | rpl::map([=](auto, bool incognito) {
+		return incognito ? u"[HIDDEN]"_q : peer->name();
+	});
 }
 
 rpl::producer<QString> TitleValue(not_null<Data::ForumTopic*> topic) {
@@ -124,13 +131,18 @@ rpl::producer<int32> ColorIdValue(not_null<Data::ForumTopic*> topic) {
 }
 
 rpl::producer<TextWithEntities> PhoneValue(not_null<UserData*> user) {
-	return rpl::merge(
-		Countries::Instance().updated(),
-		user->session().changes().peerFlagsValue(
-			user,
-			UpdateFlag::PhoneNumber) | rpl::to_empty
-	) | rpl::map([=] {
-		return tr::marked(Ui::FormatPhone(user->phone()));
+	return rpl::combine(
+		rpl::merge(
+			Countries::Instance().updated(),
+			user->session().changes().peerFlagsValue(
+				user,
+				UpdateFlag::PhoneNumber) | rpl::to_empty
+		),
+		AyuSettings::getInstance().incognitoModeValue()
+	) | rpl::map([=](auto, bool incognito) {
+		return incognito
+			? TextWithEntities{ u"[HIDDEN]"_q }
+			: tr::marked(Ui::FormatPhone(user->phone()));
 	});
 }
 
@@ -159,13 +171,17 @@ rpl::producer<TextWithEntities> PhoneOrHiddenValue(not_null<UserData*> user) {
 rpl::producer<TextWithEntities> UsernameValue(
 		not_null<PeerData*> peer,
 		bool primary) {
-	return (primary
-		? PlainPrimaryUsernameValue(peer)
-		: (PlainUsernameValue(peer) | rpl::type_erased)
-	) | rpl::map([](QString &&username) {
+	return rpl::combine(
+		(primary
+			? PlainPrimaryUsernameValue(peer)
+			: (PlainUsernameValue(peer) | rpl::type_erased)),
+		AyuSettings::getInstance().incognitoModeValue()
+	) | rpl::map([](QString &&username, bool incognito) {
 		return username.isEmpty()
 			? tr::marked()
-			: tr::marked('@' + username);
+			: (incognito
+				? TextWithEntities{ u"[HIDDEN]"_q }
+				: tr::marked('@' + username));
 	});
 }
 

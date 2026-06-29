@@ -207,6 +207,7 @@ private:
 	Ui::PeerBadge _titleBadge;
 	Ui::Text::String _title;
 	int _titleNameVersion = 0;
+	bool _titleIncognito = false;
 
 	int _selectedCount = 0;
 	bool _canDelete = false;

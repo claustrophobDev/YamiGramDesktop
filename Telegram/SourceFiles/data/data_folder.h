@@ -103,6 +103,7 @@ private:
 
 	Ui::Text::String _listEntryCache;
 	int _listEntryCacheVersion = 0;
+	bool _listEntryCacheIncognito = false;
 	int _chatListViewVersion = 0;
 	//rpl::variable<MessagePosition> _unreadPosition;
 

@@ -32,6 +32,7 @@
 #include "data/data_session.h"
 #include "data/data_user.h"
 #include "history/history.h"
+#include "history/history_item.h"
 #include "history/history_item_components.h"
 #include "history/view/history_view_context_menu.h"
 #include "history/view/history_view_element.h"
@@ -40,6 +41,8 @@
 #include "styles/style_layers.h"
 #include "styles/style_menu_icons.h"
 #include "ui/boxes/confirm_box.h"
+#include "ui/layers/generic_box.h"
+#include "ui/widgets/labels.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/widgets/menu/menu_add_action_callback_factory.h"
 #include "window/window_peer_menu.h"
@@ -460,6 +463,84 @@ void AddDeleteOwnMessagesAction(PeerData *peerData,
 		&st::menuIconTTL);
 }
 
+std::vector<std::pair<QString, int>> ComputeLineDiff(
+		const QStringList &a,
+		const QStringList &b) {
+	const auto n = int(a.size());
+	const auto m = int(b.size());
+	auto dp = std::vector<std::vector<int>>(n + 1, std::vector<int>(m + 1, 0));
+	for (auto i = n - 1; i >= 0; --i) {
+		for (auto j = m - 1; j >= 0; --j) {
+			dp[i][j] = (a[i] == b[j])
+				? (dp[i + 1][j + 1] + 1)
+				: std::max(dp[i + 1][j], dp[i][j + 1]);
+		}
+	}
+	auto result = std::vector<std::pair<QString, int>>();
+	auto i = 0;
+	auto j = 0;
+	while (i < n && j < m) {
+		if (a[i] == b[j]) {
+			result.push_back({ a[i], 0 });
+			++i;
+			++j;
+		} else if (dp[i + 1][j] >= dp[i][j + 1]) {
+			result.push_back({ a[i], 1 });
+			++i;
+		} else {
+			result.push_back({ b[j], 2 });
+			++j;
+		}
+	}
+	while (i < n) {
+		result.push_back({ a[i++], 1 });
+	}
+	while (j < m) {
+		result.push_back({ b[j++], 2 });
+	}
+	return result;
+}
+
+void ShowMessageDiff(not_null<HistoryItem*> item) {
+	const auto window = item->history()->session().tryResolveWindow();
+	if (!window) {
+		return;
+	}
+	auto revisions = AyuMessages::getEditedMessages(item, 0, 0, 200);
+	if (revisions.empty()) {
+		return;
+	}
+	std::sort(
+		revisions.begin(),
+		revisions.end(),
+		[](const AyuMessageBase &x, const AyuMessageBase &y) {
+			return x.editDate < y.editDate;
+		});
+	const auto oldText = QString::fromStdString(revisions.front().text);
+	const auto newText = item->originalText().text;
+	const auto diff = ComputeLineDiff(oldText.split('\n'), newText.split('\n'));
+	window->show(Box([=](not_null<Ui::GenericBox*> box) {
+		box->setTitle(tr::ayu_ShowChangesMenuText());
+		for (const auto &[text, type] : diff) {
+			const auto prefix = (type == 1)
+				? u"− "_q
+				: (type == 2)
+				? u"+ "_q
+				: u"  "_q;
+			const auto label = box->addRow(object_ptr<Ui::FlatLabel>(
+				box,
+				rpl::single(prefix + (text.isEmpty() ? u" "_q : text)),
+				st::boxLabel));
+			if (type == 1) {
+				label->setTextColorOverride(st::boxTextFgError->c);
+			} else if (type == 2) {
+				label->setTextColorOverride(st::boxTextFgGood->c);
+			}
+		}
+		box->addButton(tr::lng_close(), [=] { box->closeBox(); });
+	}));
+}
+
 void AddHistoryAction(not_null<Ui::PopupMenu*> menu, HistoryItem *item) {
 	if (item->hideEditedBadge()) {
 		return;
@@ -484,6 +565,11 @@ void AddHistoryAction(not_null<Ui::PopupMenu*> menu, HistoryItem *item) {
 					std::make_shared<MessageHistory::SectionMemento>(item->history()->peer, item, 0));
 			}
 		},
+		&st::ayuEditsHistoryIcon);
+
+	menu->addAction(
+		tr::ayu_ShowChangesMenuText(tr::now),
+		[=] { ShowMessageDiff(item); },
 		&st::ayuEditsHistoryIcon);
 }
 

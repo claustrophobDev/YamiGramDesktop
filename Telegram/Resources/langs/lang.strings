@@ -8264,6 +8264,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "ayu_NoteAdd" = "Add a note…";
 "ayu_EditsHistoryTitle" = "Edits History";
 "ayu_EditsHistoryMenuText" = "History";
+"ayu_ShowChangesMenuText" = "Show changes";
 "ayu_PeekOnlineMenuText" = "Peek Online";
 "ayu_ClearDeletedMenuText" = "Clear Deleted";
 "ayu_ViewDeletedMenuText" = "View Deleted";

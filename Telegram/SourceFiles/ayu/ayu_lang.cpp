@@ -204,6 +204,7 @@ static void ApplyYamiTranslations() {
 	set("ayu_DisableIncognitoTray", QString::fromUtf8("Выключить инкогнито"));
 	set("ayu_NoteLabel", QString::fromUtf8("Моя заметка"));
 	set("ayu_NoteAdd", QString::fromUtf8("Добавить заметку…"));
+	set("ayu_ShowChangesMenuText", QString::fromUtf8("Показать изменения"));
 }
 
 void AyuLanguage::applyLanguageJson(QJsonDocument doc) {

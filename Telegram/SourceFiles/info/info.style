@@ -1073,6 +1073,11 @@ topBarInfo: IconButton(topBarSearch) {
 	iconOver: icon {{ "top_bar_profile", menuIconFgOver }};
 }
 topBarInfoActive: icon {{ "top_bar_profile", windowActiveTextFg }};
+topBarGhost: IconButton(topBarSearch) {
+	icon: icon {{ "ayu/ghost", menuIconFg }};
+	iconOver: icon {{ "ayu/ghost", menuIconFgOver }};
+}
+topBarGhostActive: icon {{ "ayu/ghost", windowActiveTextFg }};
 topBarActionSkip: 10px;
 topBarActionButtonLargeRadius: 8px;
 

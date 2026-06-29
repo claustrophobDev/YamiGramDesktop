@@ -241,6 +241,7 @@ private:
 	object_ptr<Ui::IconButton> _groupCall;
 	object_ptr<Ui::IconButton> _search;
 	object_ptr<Ui::IconButton> _infoToggle;
+	object_ptr<Ui::IconButton> _ghostToggle;
 	object_ptr<Ui::IconButton> _menuToggle;
 	object_ptr<Ui::IconButton> _recentActions;
 	object_ptr<Ui::IconButton> _admins;

@@ -139,6 +139,7 @@ TopBarWidget::TopBarWidget(
 , _groupCall(this, st::topBarGroupCall)
 , _search(this, st::topBarSearch)
 , _infoToggle(this, st::topBarInfo)
+, _ghostToggle(this, st::topBarGhost)
 , _menuToggle(this, st::topBarMenuToggle)
 , _recentActions(this, st::topBarRecentActions)
 , _admins(this, st::topBarAdmins)
@@ -177,6 +178,18 @@ TopBarWidget::TopBarWidget(
 	_menuToggle->addClickHandler([=](auto) { showPeerMenu(); });
 	_menuToggle->setAcceptBoth(true, true);
 	_infoToggle->setClickedCallback([=] { toggleInfoSection(); });
+
+	_ghostToggle->setClickedCallback([=] {
+		auto &ghost = AyuSettings::ghost();
+		ghost.setGhostModeEnabled(!ghost.isGhostModeActive());
+	});
+	_ghostToggle->setAccessibleName(tr::ayu_GhostModeToggle(tr::now));
+	AyuSettings::ghost().ghostModeActiveValue(
+	) | rpl::on_next([=](bool active) {
+		_ghostToggle->setIconOverride(
+			active ? &st::topBarGhostActive : nullptr,
+			active ? &st::topBarGhostActive : nullptr);
+	}, lifetime());
 
 	_recentActions->setClickedCallback([=]
 	{
@@ -1090,6 +1103,7 @@ void TopBarWidget::updateSearchVisibility() {
 		|| (_activeChat.section == Section::SavedSublist
 			&& _activeChat.key.sublist());
 	_search->setVisible(searchAllowedMode && !_chooseForReportReason);
+	_ghostToggle->setVisible(searchAllowedMode && !_chooseForReportReason);
 }
 
 void TopBarWidget::updateControlsGeometry() {
@@ -1267,6 +1281,11 @@ void TopBarWidget::updateControlsGeometry() {
 	_search->moveToRight(_rightTaken, otherButtonsTop);
 	if (!_search->isHidden()) {
 		_rightTaken += _search->width() + st::topBarCallSkip;
+	}
+
+	_ghostToggle->moveToRight(_rightTaken, otherButtonsTop);
+	if (!_ghostToggle->isHidden()) {
+		_rightTaken += _ghostToggle->width() + st::topBarCallSkip;
 	}
 
 	updateMembersShowArea();

@@ -12,26 +12,55 @@
 
 namespace AyuFeatures::StreamerMode::Impl {
 
+namespace {
+
+void applyToWindow(HWND hwnd, bool hide) {
+	if (!hwnd) {
+		return;
+	}
+	const auto root = GetAncestor(hwnd, GA_ROOT);
+	SetWindowDisplayAffinity(
+		root ? root : hwnd,
+		hide ? WDA_EXCLUDEFROMCAPTURE : WDA_NONE);
+}
+
+BOOL CALLBACK enumProc(HWND hwnd, LPARAM param) {
+	auto processId = DWORD(0);
+	GetWindowThreadProcessId(hwnd, &processId);
+	if (processId == GetCurrentProcessId()) {
+		SetWindowDisplayAffinity(
+			hwnd,
+			param ? WDA_EXCLUDEFROMCAPTURE : WDA_NONE);
+	}
+	return TRUE;
+}
+
+void applyToProcess(bool hide) {
+	EnumWindows(enumProc, hide ? 1 : 0);
+}
+
+} // namespace
+
 void enableHook() {
+	applyToProcess(true);
 	Core::App().enumerateWindows([&](not_null<Window::Controller*> w) {
-		SetWindowDisplayAffinity(w->widget()->psHwnd(), WDA_EXCLUDEFROMCAPTURE);
+		applyToWindow(reinterpret_cast<HWND>(w->widget()->winId()), true);
 	});
 }
 
 void disableHook() {
+	applyToProcess(false);
 	Core::App().enumerateWindows([&](not_null<Window::Controller*> w) {
-		SetWindowDisplayAffinity(w->widget()->psHwnd(), WDA_NONE);
+		applyToWindow(reinterpret_cast<HWND>(w->widget()->winId()), false);
 	});
 }
 
 void hideWidgetWindow(QWidget *widget) {
-	auto handle = reinterpret_cast<HWND>(widget->window()->winId());
-	SetWindowDisplayAffinity(handle, WDA_EXCLUDEFROMCAPTURE);
+	applyToWindow(reinterpret_cast<HWND>(widget->window()->winId()), true);
 }
 
 void showWidgetWindow(QWidget *widget) {
-	auto handle = reinterpret_cast<HWND>(widget->window()->winId());
-	SetWindowDisplayAffinity(handle, WDA_NONE);
+	applyToWindow(reinterpret_cast<HWND>(widget->window()->winId()), false);
 }
 
 }

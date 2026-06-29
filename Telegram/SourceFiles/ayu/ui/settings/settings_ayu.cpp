@@ -676,6 +676,16 @@ void BuildOther(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 		.getter = &AyuSettings::disableAds,
 		.setter = &AyuSettings::setDisableAds,
 	});
+
+	ayu.addSectionDivider();
+	ayu.addSettingToggle({
+		.id = u"ayu/streamerMode"_q,
+		.title = tr::ayu_HideFromScreenCapture(),
+		.getter = &AyuSettings::streamerMode,
+		.setter = &AyuSettings::setStreamerMode,
+	});
+	builder.addSkip();
+	builder.addDividerText(tr::ayu_HideFromScreenCaptureDescription());
 }
 
 const auto kMeta = BuildHelper({

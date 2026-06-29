@@ -275,6 +275,7 @@ public:
 	[[nodiscard]] bool hideFromBlocked() const { return _hideFromBlocked.current(); }
 	[[nodiscard]] bool semiTransparentDeletedMessages() const { return _semiTransparentDeletedMessages.current(); }
 	[[nodiscard]] bool disableAds() const { return _disableAds.current(); }
+	[[nodiscard]] bool streamerMode() const { return _streamerMode.current(); }
 	[[nodiscard]] bool disableStories() const { return _disableStories.current(); }
 	[[nodiscard]] bool disableCustomBackgrounds() const { return _disableCustomBackgrounds.current(); }
 	[[nodiscard]] bool hidePremiumStatuses() const { return _hidePremiumStatuses.current(); }
@@ -359,6 +360,7 @@ public:
 	void setHideFromBlocked(bool val);
 	void setSemiTransparentDeletedMessages(bool val);
 	void setDisableAds(bool val);
+	void setStreamerMode(bool val);
 	void setDisableStories(bool val);
 	void setDisableCustomBackgrounds(bool val);
 	void setHidePremiumStatuses(bool val);
@@ -453,6 +455,8 @@ public:
 	[[nodiscard]] rpl::producer<bool> semiTransparentDeletedMessagesChanges() const { return _semiTransparentDeletedMessages.changes(); }
 	[[nodiscard]] rpl::producer<bool> disableAdsValue() const { return _disableAds.value(); }
 	[[nodiscard]] rpl::producer<bool> disableAdsChanges() const { return _disableAds.changes(); }
+	[[nodiscard]] rpl::producer<bool> streamerModeValue() const { return _streamerMode.value(); }
+	[[nodiscard]] rpl::producer<bool> streamerModeChanges() const { return _streamerMode.changes(); }
 	[[nodiscard]] rpl::producer<bool> disableStoriesValue() const { return _disableStories.value(); }
 	[[nodiscard]] rpl::producer<bool> disableStoriesChanges() const { return _disableStories.changes(); }
 	[[nodiscard]] rpl::producer<bool> disableCustomBackgroundsValue() const { return _disableCustomBackgrounds.value(); }
@@ -621,6 +625,7 @@ private:
 	rpl::variable<bool> _hideFromBlocked = false;
 	rpl::variable<bool> _semiTransparentDeletedMessages = false;
 	rpl::variable<bool> _disableAds = true;
+	rpl::variable<bool> _streamerMode = false;
 	rpl::variable<bool> _disableStories = false;
 	rpl::variable<bool> _disableCustomBackgrounds = false;
 	rpl::variable<bool> _showOnlyAddedEmojisAndStickers = false;

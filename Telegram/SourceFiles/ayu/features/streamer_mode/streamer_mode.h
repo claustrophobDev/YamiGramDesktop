@@ -11,6 +11,8 @@ namespace AyuFeatures::StreamerMode {
 bool isEnabled();
 void enable();
 void disable();
+void apply(bool enabled);
+void restore();
 void hideWidgetWindow(QWidget *widget);
 void showWidgetWindow(QWidget *widget);
 

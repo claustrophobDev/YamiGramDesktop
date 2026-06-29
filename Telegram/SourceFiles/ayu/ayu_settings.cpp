@@ -10,6 +10,7 @@
 #include "tray.h"
 #include "ayu/ayu_ui_settings.h"
 #include "ayu/ayu_worker.h"
+#include "ayu/features/streamer_mode/streamer_mode.h"
 #include "ayu/ui/ayu_logo.h"
 #include "core/application.h"
 #include "features/filters/filters_cache_controller.h"
@@ -580,6 +581,13 @@ void AyuSettings::setDisableAds(bool val) {
 	save();
 }
 
+void AyuSettings::setStreamerMode(bool val) {
+	if (_streamerMode.current() == val) return;
+	_streamerMode = val;
+	save();
+	AyuFeatures::StreamerMode::apply(val);
+}
+
 void AyuSettings::setDisableStories(bool val) {
 	if (_disableStories.current() == val) return;
 	_disableStories = val;
@@ -1068,6 +1076,7 @@ void to_json(nlohmann::json &j, const AyuSettings &s) {
 		{"hideFromBlocked", s._hideFromBlocked.current()},
 		{"semiTransparentDeletedMessages", s._semiTransparentDeletedMessages.current()},
 		{"disableAds", s._disableAds.current()},
+		{"streamerMode", s._streamerMode.current()},
 		{"disableStories", s._disableStories.current()},
 		{"disableCustomBackgrounds", s._disableCustomBackgrounds.current()},
 		{"showOnlyAddedEmojisAndStickers", s._showOnlyAddedEmojisAndStickers.current()},
@@ -1168,6 +1177,7 @@ void from_json(const nlohmann::json &j, AyuSettings &s) {
 	s._hideFromBlocked = j.value("hideFromBlocked", defaults._hideFromBlocked.current());
 	s._semiTransparentDeletedMessages = j.value("semiTransparentDeletedMessages", defaults._semiTransparentDeletedMessages.current());
 	s._disableAds = j.value("disableAds", defaults._disableAds.current());
+	s._streamerMode = j.value("streamerMode", defaults._streamerMode.current());
 	s._disableStories = j.value("disableStories", defaults._disableStories.current());
 	s._disableCustomBackgrounds = j.value("disableCustomBackgrounds", defaults._disableCustomBackgrounds.current());
 	s._showOnlyAddedEmojisAndStickers = j.value("showOnlyAddedEmojisAndStickers", defaults._showOnlyAddedEmojisAndStickers.current());

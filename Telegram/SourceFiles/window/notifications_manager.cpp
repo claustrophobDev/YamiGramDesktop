@@ -214,6 +214,11 @@ System::System()
 			Core::App().domain().notifyUnreadBadgeChanged();
 		}
 	}, lifetime());
+
+	AyuSettings::getInstance().streamerModeChanges(
+	) | rpl::on_next([=](bool) {
+		createManager();
+	}, lifetime());
 }
 
 void System::createManager() {
@@ -230,9 +235,12 @@ void System::setManager(Fn<std::unique_ptr<Manager>()> create) {
 		}
 	});
 
+	const auto hideForCapture = AyuSettings::getInstance().streamerMode()
+		&& !nativeEnforced();
 	if ((Core::App().settings().nativeNotifications()
 				|| nativeEnforced())
-			&& Platform::Notifications::Supported()) {
+			&& Platform::Notifications::Supported()
+			&& !hideForCapture) {
 		if (_manager->type() == ManagerType::Native) {
 			return;
 		}

@@ -8251,11 +8251,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "ayu_GhostModeGlobalSettingsDescription" = "Same for all accounts";
 "ayu_GhostModeSwitchedToGlobalSettings" = "Switched to same settings for all accounts.";
 "ayu_GhostModeSwitchedToIndividualSettings" = "Switched to individual settings for each account.";
-"ayu_StreamerModeToggle" = "Streamer Mode";
-"ayu_EnableStreamerModeTray" = "Enable Streamer Mode";
-"ayu_DisableStreamerModeTray" = "Disable Streamer Mode";
-"ayu_HideFromScreenCapture" = "Hide from Screenshots";
-"ayu_HideFromScreenCaptureDescription" = "Makes the YamiGram window appear black on screenshots, screen recordings and Discord/OBS stream captures. Uses the system SetWindowDisplayAffinity flag (Windows 10 2004+ and macOS).";
+"ayu_StreamerModeToggle" = "Hide from Screen Capture";
+"ayu_EnableStreamerModeTray" = "Hide from Screen Capture";
+"ayu_DisableStreamerModeTray" = "Show on Screen Capture";
+"ayu_HideFromScreenCapture" = "Hide from Screen Capture";
+"ayu_HideFromScreenCaptureDescription" = "Keeps your chats and YamiGram itself private: the window turns black on screenshots, screen recordings and Discord/OBS streams. Notifications are switched to the in-app type so they stay hidden too.";
 "ayu_EditsHistoryTitle" = "Edits History";
 "ayu_EditsHistoryMenuText" = "History";
 "ayu_PeekOnlineMenuText" = "Peek Online";

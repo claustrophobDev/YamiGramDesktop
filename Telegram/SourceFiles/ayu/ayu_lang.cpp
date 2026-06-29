@@ -175,11 +175,43 @@ void AyuLanguage::fetchError(QNetworkReply::NetworkError e) {
 	}
 }
 
+static void ApplyYamiTranslations() {
+	if (!Lang::GetInstance().id().startsWith(qsl("ru"))) {
+		return;
+	}
+	const auto set = [](const char *key, const QString &val) {
+		Lang::GetInstance().resetValue(QByteArray(key));
+		Lang::GetInstance().applyValue(QByteArray(key), val.toUtf8());
+	};
+	set("ayu_HideFromScreenCapture",
+		QString::fromUtf8("Скрыть от захвата экрана"));
+	set("ayu_HideFromScreenCaptureDescription",
+		QString::fromUtf8("Делает окно YamiGram чёрным на скриншотах, записи "
+			"экрана и стримах в Discord/OBS. Уведомления переключаются на "
+			"встроенные, чтобы тоже не палиться."));
+	set("ayu_StreamerModeToggle",
+		QString::fromUtf8("Скрыть от захвата экрана"));
+	set("ayu_EnableStreamerModeTray",
+		QString::fromUtf8("Скрыть от захвата экрана"));
+	set("ayu_DisableStreamerModeTray",
+		QString::fromUtf8("Показать при захвате экрана"));
+	set("ayu_IncognitoMode", QString::fromUtf8("Инкогнито"));
+	set("ayu_IncognitoModeDescription",
+		QString::fromUtf8("Заменяет твоё имя в меню и имена чатов в списке на "
+			"[HIDDEN]. Удобно показать приложение или скинуть скрин бага, не "
+			"спалив контакты. Переключается и из трея."));
+	set("ayu_EnableIncognitoTray", QString::fromUtf8("Включить инкогнито"));
+	set("ayu_DisableIncognitoTray", QString::fromUtf8("Выключить инкогнито"));
+	set("ayu_NoteLabel", QString::fromUtf8("Моя заметка"));
+	set("ayu_NoteAdd", QString::fromUtf8("Добавить заметку…"));
+}
+
 void AyuLanguage::applyLanguageJson(QJsonDocument doc) {
 	const auto json = doc.object();
 	for (const QString &brokenKey : json.keys()) {
 		auto key = qsl("ayu_") + brokenKey;
 		auto val = json.value(brokenKey).toString().replace(qsl("&amp;"), qsl("&"));
+		val = val.replace(qsl("AyuGram"), qsl("YamiGram"));
 
 		if (key.endsWith("_Android")) {
 			continue;
@@ -209,5 +241,6 @@ void AyuLanguage::applyLanguageJson(QJsonDocument doc) {
 		Lang::GetInstance().resetValue(key.toUtf8());
 		Lang::GetInstance().applyValue(key.toUtf8(), val.toUtf8());
 	}
+	ApplyYamiTranslations();
 	Lang::GetInstance().updatePluralRules();
 }

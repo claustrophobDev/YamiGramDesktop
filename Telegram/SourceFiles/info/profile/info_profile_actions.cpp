@@ -1799,20 +1799,18 @@ object_ptr<Ui::RpWidget> DetailsFiller::setupInfo() {
 				tr::ayu_NoteLabel(),
 				std::move(noteValue),
 				QString());
-			noteLine.text->setLink(
-				1,
-				std::make_shared<LambdaClickHandler>([=] {
-					show->show(Box<EditMarkBox>(
-						tr::ayu_NoteLabel(),
-						AyuSettings::getInstance().peerNote(peerId),
-						QString(),
-						[=](const QString &value) {
-							AyuSettings::getInstance().setPeerNote(
-								peerId,
-								value);
-						},
-						kNoteLimit));
-				}));
+			noteLine.text->overrideLinkClickHandler([=] {
+				show->show(Box<EditMarkBox>(
+					tr::ayu_NoteLabel(),
+					AyuSettings::getInstance().peerNote(peerId),
+					QString(),
+					[=](const QString &value) {
+						AyuSettings::getInstance().setPeerNote(
+							peerId,
+							value);
+					},
+					kNoteLimit));
+			});
 		}
 
 		if (!user->isBot()) {

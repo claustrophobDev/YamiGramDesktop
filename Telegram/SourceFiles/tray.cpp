@@ -109,27 +109,21 @@ void Tray::rebuildMenu() {
 
 	const auto &settings = AyuSettings::getInstance();
 
-	if (settings.showGhostToggleInTray()) {
-		auto ghostActiveChanges = AyuSettings::getInstance().useGlobalGhostModeValue()
-			| rpl::map([](bool) {
-				return AyuSettings::ghost().ghostModeActiveValue();
-			})
-			| rpl::flatten_latest();
-
-		auto turnGhostModeText = rpl::combine(
+	{
+		auto turnIncognitoText = rpl::combine(
 			_textUpdates.events_starting_with({}),
-			std::move(ghostActiveChanges)
+			AyuSettings::getInstance().incognitoModeValue()
 		) | rpl::map([=](auto, bool active) {
 			return active
-				? tr::ayu_DisableGhostModeTray(tr::now)
-				: tr::ayu_EnableGhostModeTray(tr::now);
+				? tr::ayu_DisableIncognitoTray(tr::now)
+				: tr::ayu_EnableIncognitoTray(tr::now);
 		});
 		_tray.addAction(
-			std::move(turnGhostModeText),
+			std::move(turnIncognitoText),
 			[=]
 			{
-				auto &ghost = AyuSettings::ghost();
-				ghost.setGhostModeEnabled(!ghost.isGhostModeActive());
+				auto &settings = AyuSettings::getInstance();
+				settings.setIncognitoMode(!settings.incognitoMode());
 			});
 	}
 

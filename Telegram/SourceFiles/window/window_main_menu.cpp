@@ -1005,11 +1005,13 @@ void MainMenu::drawName(Painter &p) {
 		- _toggleAccounts->rightSkip();
 
 	const auto user = _controller->session().user();
-	if (_nameVersion < user->nameVersion()) {
+	const auto incognito = AyuSettings::getInstance().incognitoMode();
+	if (_nameVersion < user->nameVersion() || _nameIncognito != incognito) {
 		_nameVersion = user->nameVersion();
+		_nameIncognito = incognito;
 		_name.setText(
 			st::semiboldTextStyle,
-			user->name(),
+			incognito ? u"[HIDDEN]"_q : user->name(),
 			Ui::NameTextOptions());
 		moveBadge();
 	}

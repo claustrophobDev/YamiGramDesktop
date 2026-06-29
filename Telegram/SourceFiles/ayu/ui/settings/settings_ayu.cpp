@@ -686,6 +686,15 @@ void BuildOther(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 	});
 	builder.addSkip();
 	builder.addDividerText(tr::ayu_HideFromScreenCaptureDescription());
+
+	ayu.addSettingToggle({
+		.id = u"ayu/incognitoMode"_q,
+		.title = tr::ayu_IncognitoMode(),
+		.getter = &AyuSettings::incognitoMode,
+		.setter = &AyuSettings::setIncognitoMode,
+	});
+	builder.addSkip();
+	builder.addDividerText(tr::ayu_IncognitoModeDescription());
 }
 
 const auto kMeta = BuildHelper({

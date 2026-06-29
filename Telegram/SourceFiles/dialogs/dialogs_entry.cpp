@@ -28,6 +28,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item.h"
 #include "styles/style_dialogs.h" // st::dialogsTextWidthMin
 
+// AyuGram includes
+#include "ayu/ayu_settings.h"
+
 namespace Dialogs {
 namespace {
 
@@ -300,12 +303,14 @@ void Entry::notifyUnreadStateChange(const UnreadState &wasState) {
 }
 
 const Ui::Text::String &Entry::chatListNameText() const {
+	const auto incognito = AyuSettings::getInstance().incognitoMode();
 	const auto version = chatListNameVersion();
-	if (_chatListNameVersion < version) {
+	if (_chatListNameVersion < version || _chatListNameIncognito != incognito) {
 		_chatListNameVersion = version;
+		_chatListNameIncognito = incognito;
 		_chatListNameText.setText(
 			st::semiboldTextStyle,
-			chatListName(),
+			incognito ? u"[HIDDEN]"_q : chatListName(),
 			Ui::NameTextOptions());
 	}
 	return _chatListNameText;

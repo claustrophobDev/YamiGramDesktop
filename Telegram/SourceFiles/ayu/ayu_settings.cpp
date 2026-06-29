@@ -588,6 +588,12 @@ void AyuSettings::setStreamerMode(bool val) {
 	AyuFeatures::StreamerMode::apply(val);
 }
 
+void AyuSettings::setIncognitoMode(bool val) {
+	if (_incognitoMode.current() == val) return;
+	_incognitoMode = val;
+	save();
+}
+
 void AyuSettings::setDisableStories(bool val) {
 	if (_disableStories.current() == val) return;
 	_disableStories = val;
@@ -1077,6 +1083,7 @@ void to_json(nlohmann::json &j, const AyuSettings &s) {
 		{"semiTransparentDeletedMessages", s._semiTransparentDeletedMessages.current()},
 		{"disableAds", s._disableAds.current()},
 		{"streamerMode", s._streamerMode.current()},
+		{"incognitoMode", s._incognitoMode.current()},
 		{"disableStories", s._disableStories.current()},
 		{"disableCustomBackgrounds", s._disableCustomBackgrounds.current()},
 		{"showOnlyAddedEmojisAndStickers", s._showOnlyAddedEmojisAndStickers.current()},
@@ -1178,6 +1185,7 @@ void from_json(const nlohmann::json &j, AyuSettings &s) {
 	s._semiTransparentDeletedMessages = j.value("semiTransparentDeletedMessages", defaults._semiTransparentDeletedMessages.current());
 	s._disableAds = j.value("disableAds", defaults._disableAds.current());
 	s._streamerMode = j.value("streamerMode", defaults._streamerMode.current());
+	s._incognitoMode = j.value("incognitoMode", defaults._incognitoMode.current());
 	s._disableStories = j.value("disableStories", defaults._disableStories.current());
 	s._disableCustomBackgrounds = j.value("disableCustomBackgrounds", defaults._disableCustomBackgrounds.current());
 	s._showOnlyAddedEmojisAndStickers = j.value("showOnlyAddedEmojisAndStickers", defaults._showOnlyAddedEmojisAndStickers.current());

@@ -108,6 +108,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtGui/QClipboard>
 
 // AyuGram includes
+#include "ayu/ayu_settings.h"
+#include "ayu/ui/boxes/edit_mark_box.h"
 #include "ayu/ui/utils/ayu_profile_values.h"
 #include "ayu/utils/telegram_helpers.h"
 #include "base/event_filter.h"
@@ -1775,6 +1777,43 @@ object_ptr<Ui::RpWidget> DetailsFiller::setupInfo() {
 			Ui::DefaultShowFillPeerQrBoxCallback(show, user);
 			return false;
 		});
+
+		{
+			constexpr auto kNoteLimit = 200;
+			const auto peerId = _peer->id.value;
+			const auto show = controller->uiShow();
+			auto noteValue = rpl::single(
+				rpl::empty
+			) | rpl::then(
+				AyuSettings::getInstance().peerNoteChanges(
+				) | rpl::filter([=](uint64 id) {
+					return (id == peerId);
+				}) | rpl::to_empty
+			) | rpl::map([=]() -> TextWithEntities {
+				const auto note = AyuSettings::getInstance().peerNote(peerId);
+				return note.isEmpty()
+					? tr::link(TextWithEntities{ tr::ayu_NoteAdd(tr::now) }, 1)
+					: tr::link(TextWithEntities{ note }, 1);
+			});
+			const auto noteLine = addInfoOneLine(
+				tr::ayu_NoteLabel(),
+				std::move(noteValue),
+				QString());
+			noteLine.text->setLink(
+				1,
+				std::make_shared<LambdaClickHandler>([=] {
+					show->show(Box<EditMarkBox>(
+						tr::ayu_NoteLabel(),
+						AyuSettings::getInstance().peerNote(peerId),
+						QString(),
+						[=](const QString &value) {
+							AyuSettings::getInstance().setPeerNote(
+								peerId,
+								value);
+						},
+						kNoteLimit));
+				}));
+		}
 
 		if (!user->isBot()) {
 			tracker.track(result->add(

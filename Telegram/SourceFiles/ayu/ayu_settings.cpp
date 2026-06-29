@@ -19,6 +19,7 @@
 #include "main/main_session.h"
 #include "platform/platform_translate_provider.h"
 #include "rpl/combine.h"
+#include "rpl/event_stream.h"
 #include "window/window_controller.h"
 
 #include <fstream>
@@ -594,6 +595,34 @@ void AyuSettings::setIncognitoMode(bool val) {
 	save();
 }
 
+static rpl::event_stream<uint64> PeerNoteChanges;
+
+QString AyuSettings::peerNote(uint64 peerId) const {
+	const auto it = _peerNotes.find(peerId);
+	return (it != _peerNotes.end()) ? it->second : QString();
+}
+
+void AyuSettings::setPeerNote(uint64 peerId, const QString &note) {
+	const auto trimmed = note.trimmed();
+	if (trimmed.isEmpty()) {
+		if (_peerNotes.erase(peerId) == 0) {
+			return;
+		}
+	} else {
+		const auto it = _peerNotes.find(peerId);
+		if (it != _peerNotes.end() && it->second == trimmed) {
+			return;
+		}
+		_peerNotes[peerId] = trimmed;
+	}
+	save();
+	PeerNoteChanges.fire_copy(peerId);
+}
+
+rpl::producer<uint64> AyuSettings::peerNoteChanges() const {
+	return PeerNoteChanges.events();
+}
+
 void AyuSettings::setDisableStories(bool val) {
 	if (_disableStories.current() == val) return;
 	_disableStories = val;
@@ -1160,10 +1189,25 @@ void to_json(nlohmann::json &j, const AyuSettings &s) {
 		{"singleCornerRadius", s._singleCornerRadius.current()},
 		{"messageShotSettings", s._messageShotSettings}
 	};
+	auto peerNotes = nlohmann::json::object();
+	for (const auto &[id, note] : s._peerNotes) {
+		peerNotes[std::to_string(id)] = note.toStdString();
+	}
+	j["peerNotes"] = peerNotes;
 }
 
 void from_json(const nlohmann::json &j, AyuSettings &s) {
 	AyuSettings defaults;
+
+	s._peerNotes.clear();
+	if (j.contains("peerNotes") && j["peerNotes"].is_object()) {
+		for (auto &[key, value] : j["peerNotes"].items()) {
+			if (value.is_string()) {
+				s._peerNotes[std::stoull(key)] = QString::fromStdString(
+					value.get<std::string>());
+			}
+		}
+	}
 
 	if (j.contains("ghostModeSettings") && j["ghostModeSettings"].is_object()) {
 		s._ghostAccounts.clear();

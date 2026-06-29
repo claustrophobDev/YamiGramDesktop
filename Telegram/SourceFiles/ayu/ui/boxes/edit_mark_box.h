@@ -16,7 +16,7 @@ class InputField;
 class EditMarkBox : public Ui::BoxContent
 {
 public:
-	EditMarkBox(QWidget *, rpl::producer<QString> title, const QString& currentValue, QString  defaultValue, const Fn<void(const QString&)> &saveCallback);
+	EditMarkBox(QWidget *, rpl::producer<QString> title, const QString& currentValue, QString  defaultValue, const Fn<void(const QString&)> &saveCallback, int maxLength = 0);
 
 protected:
 	void setInnerFocus() override;
@@ -30,6 +30,7 @@ private:
 	rpl::producer<QString> _title;
 	QString _defaultValue;
 	Fn<void(const QString&)> _saveCallback;
+	int _maxLength = 0;
 
 	object_ptr<Ui::InputField> _text;
 };

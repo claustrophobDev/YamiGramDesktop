@@ -22,10 +22,12 @@ EditMarkBox::EditMarkBox(QWidget *,
 						 rpl::producer<QString> title,
 						 const QString &currentValue,
 						 QString defaultValue,
-						 const Fn<void(const QString &)> &saveCallback)
+						 const Fn<void(const QString &)> &saveCallback,
+						 int maxLength)
 	: _title(title)
 	  , _defaultValue(std::move(defaultValue))
 	  , _saveCallback(saveCallback)
+	  , _maxLength(maxLength)
 	  , _text(
 		  this,
 		  st::defaultInputField,
@@ -34,6 +36,9 @@ EditMarkBox::EditMarkBox(QWidget *,
 }
 
 void EditMarkBox::prepare() {
+	if (_maxLength > 0) {
+		_text->setMaxLength(_maxLength);
+	}
 	auto newHeight = st::contactPadding.top() + _text->height();
 
 	setTitle(_title);

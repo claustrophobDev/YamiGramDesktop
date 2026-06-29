@@ -8260,6 +8260,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "ayu_IncognitoModeDescription" = "Replaces your name in the menu and the names of your chats in the list with [HIDDEN]. Handy for showing the app to someone or sending a bug screenshot without exposing who you talk to. Can also be toggled from the tray menu.";
 "ayu_EnableIncognitoTray" = "Enable Incognito";
 "ayu_DisableIncognitoTray" = "Disable Incognito";
+"ayu_NoteLabel" = "My Note";
+"ayu_NoteAdd" = "Add a note…";
 "ayu_EditsHistoryTitle" = "Edits History";
 "ayu_EditsHistoryMenuText" = "History";
 "ayu_PeekOnlineMenuText" = "Peek Online";
